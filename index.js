@@ -4,7 +4,6 @@ const port = 3001
 const bodyParser = require('body-parser')
 const db = require('./connection.js')
 const response = require('./response.js')
-const fs = require('fs');
 
 // try {
 //   const sqlScript = fs.readFileSync('dailydeals_db.sql', 'utf8');
