@@ -5,13 +5,13 @@ const bodyParser = require('body-parser')
 const db = require('./connection.js')
 const response = require('./response.js')
 
-// try {
-//   const sqlScript = fs.readFileSync('dailydeals_db.sql', 'utf8');
-// } catch (err) {
-//   console.error('Gagal membaca file SQL: ', err);
-// }
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+  next();
+});
 app.use(bodyParser.json())
+
 
 // 
 app.get('/', (req, res) => {
