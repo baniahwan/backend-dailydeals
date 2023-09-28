@@ -12,11 +12,12 @@ app.use((req, res, next) => {
 });
 app.use(bodyParser.json())
 
+app.use(express.static("public"));
 
 // 
-app.get('/', (req, res) => {
-  response(200, "Ini data", "ini message", res)
-})
+// app.get('/', (req, res) => {
+//   response(200, "Ini data", "ini message", res)
+// })
 
 // Get all menu
 app.get('/menu', (req, res) => {
