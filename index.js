@@ -103,31 +103,6 @@ app.delete('/menu', (req, res) => {
   })
 })
 
-// app.get('/', (req, res) => {
-//   const sql = "SELECT * FROM user"
-//   db.query(sql, (error, result) => {
-//     //hasil data dari mysql
-//     response(200, result, "succesfully get all data from user", res)
-//   })
-// })
-
-// app.get('/find', (req, res) => {
-//   const sql = `SELECT * FROM user WHERE id = ${req.query.id}`
-//   db.query(sql, (error, result)=> {
-//     response(200, result, "find username", res)
-//   })
-// })
-
-// app.post('/login',(req, res) => {
-//     console.log({ requestFromOutside: req.body })
-//     res.send('Login Berhasil!')
-// })
-
-// app.put('/username', (req, res) => {
-//     console.log({ updateData: req.body })
-//     res.send('update berhasil')
-// })
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
