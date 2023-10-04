@@ -111,6 +111,24 @@ app.post('/login', (req, res) => {
   });
 });
 
+// Route untuk menambahkan data ke tabel "keranjang"
+app.post('/keranjang', (req, res) => {
+  const { jumlah, total_harga, id_menu } = req.body;
+
+  const sql = 'INSERT INTO keranjang (jumlah, total_harga, id_menu) VALUES (?, ?, ?, ?, ?)';
+  const values = [jumlah, total_harga, id_menu,];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting data into keranjang:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    } else {
+      res.status(200).json({ message: 'Data added to keranjang successfully' });
+    }
+  });
+});
+
+
 app.put('/menu', (req, res) => {
   const { id, nama, deskripsi, harga, gambar, kategori } = req.body
   const sql = `UPDATE menu SET nama='${nama}', deskripsi='${deskripsi}', harga=${harga}, 
