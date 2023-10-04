@@ -115,7 +115,7 @@ app.post('/login', (req, res) => {
 app.post('/keranjang', (req, res) => {
   const { jumlah, total_harga, id_menu } = req.body;
 
-  const sql = 'INSERT INTO keranjang (jumlah, total_harga, id_menu) VALUES (?, ?, ?, ?, ?)';
+  const sql = `INSERT INTO keranjang (jumlah, total_harga, id_menu) VALUES (${jumlah}, ${total_harga}, ${id_menu})`;
   const values = [jumlah, total_harga, id_menu,];
 
   db.query(sql, values, (err, result) => {
