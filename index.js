@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors');
 const app = express()
 const port = 3001
 const bodyParser = require('body-parser')
@@ -11,10 +12,14 @@ const crypto = require('crypto')
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5501');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
+app.use(cors({
+  origin: 'http://127.0.0.1:5501',
+}));
 
 app.use(bodyParser.json())
 
@@ -30,7 +35,8 @@ app.get('/', (req, res) => {
     Gunakan /login untuk login (post).`, res)
 })
 
-// Get all menu
+// MENU
+// GET ALL MENU
 app.get('/menu', (req, res) => {
   const sql = "SELECT * FROM menu"
   db.query(sql, (err, fields) => {
@@ -39,7 +45,7 @@ app.get('/menu', (req, res) => {
   })
 })
 
-//Get menu by kategori
+//GET MENU BY KATEGORI
 app.get('/menu/:kategori', (req, res) => {
   const kategori = req.params.kategori
   const sql = `SELECT * FROM menu WHERE kategori = "${kategori}"`
@@ -49,7 +55,9 @@ app.get('/menu/:kategori', (req, res) => {
   })
 })
 
-// Get all user
+
+// USER
+// GET ALL USER
 app.get('/user', (req, res) => {
   const sql = "SELECT * FROM user"
   db.query(sql, (err, fields) => {
@@ -58,8 +66,7 @@ app.get('/user', (req, res) => {
   })
 })
 
-
-// Post user (untuk register)
+// POST USER (UNTUK REGISTER)
 app.post('/register', (req, res) => {
   const { username, email, password } = req.body;
   // Enkripsi password menggunakan MD5
@@ -79,7 +86,7 @@ app.post('/register', (req, res) => {
   });
 });
 
-// post user (untuk login)
+// POST USER (UNTUK LOGIN)
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   
@@ -112,7 +119,7 @@ app.post('/login', (req, res) => {
 });
 
 // KERANJANG
-// Route untuk menambahkan data ke tabel "keranjang"
+// UNTUK MENAMBAHKAN DATA KE TABEL keranjang
 app.post('/keranjang', (req, res) => {
   const { jumlah_item, total_harga, id_menu, id_user } = req.body;
 
@@ -129,7 +136,7 @@ app.post('/keranjang', (req, res) => {
   });
 });
 
-// Route untuk menampilkan data dari tabel keranjang
+// UNTUK MENAMPILKAN DATA DARI TABEL keranjang
 app.get('/keranjang/:id_menu', (req, res) => {
   const id_menu = req.params.id_menu
   const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
@@ -141,7 +148,7 @@ app.get('/keranjang/:id_menu', (req, res) => {
   })
 })
 
-// Route untuk menampilkan semua data dari tabel keranjang milik user
+// UNTUK MENAMPILKAN SEMUA DATA DARI TABEL KERANJANG DENGAN ID USER
 app.get('/keranjang/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
   const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
@@ -154,7 +161,7 @@ app.get('/keranjang/user/:id_user', (req, res) => {
   });
 });
 
-// Route untuk menghapus data menu dari keranjang
+// UNTUK MENGHAPUS DATA MENU DARI KERANJANG
 app.delete('/deleteitemcart', (req, res) => {
   const { id } = req.body
   const sql = `DELETE FROM keranjang WHERE id=${id}`
@@ -164,54 +171,52 @@ app.delete('/deleteitemcart', (req, res) => {
       const data = {
         isDeleted: true,
       }
-      response(200, data, "Deleted menu succes", res)
+      response(200, data, "Deleted menu on cart succes", res)
     } else {
-      response(404, "menu not found", "error", res)
+      response(404, "menu on cart not found", "error", res)
     }
   })
 })
 
-
-
-
-
-
-
-app.put('/menu', (req, res) => {
-  const { id, nama, deskripsi, harga, gambar, kategori } = req.body
-  const sql = `UPDATE menu SET nama='${nama}', deskripsi='${deskripsi}', harga=${harga}, 
-  gambar='${gambar}', kategori='${kategori}'`
-
-  db.query(sql, (err, fields) => {
-    if (err) response(500, "invalid", "error", res)
-    if (fields?.affectedRows){
-      const data = {
-        isSuccess: fields.affectedRows,
-        message: fields.message,
-      }
-      response(200, data, "Succes update menu", res)
-    } else {
-      response(404, "menu not found", "error", res)
-    }
-  })
-})
-
-app.delete('/menu', (req, res) => {
-  const { id } = req.body
-  const sql = `DELETE FROM menu WHERE id=${id}`
-  db.query(sql, (err, fields) => {
-    if (err) response(500, "invalid", "error", res)
-    if (fields?.affectedRows){
-      const data = {
-        isDeleted: fields.affectedRows,
-      }
-      response(200, data, "Deleted menu succes", res)
-    } else {
-      response(404, "menu not found", "error", res)
-    }
-  })
-})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+
+
+
+// app.put('/menu', (req, res) => {
+//   const { id, nama, deskripsi, harga, gambar, kategori } = req.body
+//   const sql = `UPDATE menu SET nama='${nama}', deskripsi='${deskripsi}', harga=${harga}, 
+//   gambar='${gambar}', kategori='${kategori}'`
+
+//   db.query(sql, (err, fields) => {
+//     if (err) response(500, "invalid", "error", res)
+//     if (fields?.affectedRows){
+//       const data = {
+//         isSuccess: fields.affectedRows,
+//         message: fields.message,
+//       }
+//       response(200, data, "Succes update menu", res)
+//     } else {
+//       response(404, "menu not found", "error", res)
+//     }
+//   })
+// })
+
+// app.delete('/menu', (req, res) => {
+//   const { id } = req.body
+//   const sql = `DELETE FROM menu WHERE id=${id}`
+//   db.query(sql, (err, fields) => {
+//     if (err) response(500, "invalid", "error", res)
+//     if (fields?.affectedRows){
+//       const data = {
+//         isDeleted: fields.affectedRows,
+//       }
+//       response(200, data, "Deleted menu succes", res)
+//     } else {
+//       response(404, "menu not found", "error", res)
+//     }
+//   })
+// })
