@@ -136,7 +136,7 @@ app.post('/keranjang', (req, res) => {
   });
 });
 
-// UNTUK MENAMPILKAN DATA DARI TABEL keranjang
+// UNTUK MENAMPILKAN DATA MENU DARI TABEL keranjang DENGAN ID MENU
 app.get('/keranjang/:id_menu', (req, res) => {
   const id_menu = req.params.id_menu
   const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga, keranjang.id_keranjang 
