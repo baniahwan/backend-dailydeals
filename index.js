@@ -151,9 +151,9 @@ app.get('/keranjang/:id_menu', (req, res) => {
 // UNTUK MENAMPILKAN SEMUA DATA DARI TABEL KERANJANG DENGAN ID USER
 app.get('/keranjang/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
-  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
+  const sql = `SELECT menu.id_menu, menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
                FROM keranjang 
-               JOIN menu ON keranjang.id_menu = menu.id 
+               JOIN menu ON keranjang.id_menu = menu.id_menu
                WHERE keranjang.id_user = ${id_user}`;
   db.query(sql, (err, fields) => {
     if (err) throw err;
