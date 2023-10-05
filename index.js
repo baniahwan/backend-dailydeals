@@ -129,18 +129,19 @@ app.post('/keranjang', (req, res) => {
   });
 });
 
-// Route untuk menampilkan data dari tabel "keranjang"
+// Route untuk menampilkan data dari tabel keranjang
 app.get('/keranjang/:id_menu', (req, res) => {
   const id_menu = req.params.id_menu
-  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga FROM keranjang JOIN menu ON keranjang.id_menu = menu.id 
-  WHERE keranjang.id_menu = ${id_menu}`
+  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
+               FROM keranjang JOIN menu ON keranjang.id_menu = menu.id 
+               WHERE keranjang.id_menu = ${id_menu}`
   db.query(sql, (err, fields) => {
     if (err) throw err
-    response(200, fields, "get data from keranjang successfully", res)
+    response(200, fields, "get data from keranjang by id menu successfully", res)
   })
 })
 
-// Route untuk menampilkan semua data dari tabel "keranjang" milik user
+// Route untuk menampilkan semua data dari tabel keranjang milik user
 app.get('/keranjang/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
   const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
@@ -149,9 +150,27 @@ app.get('/keranjang/user/:id_user', (req, res) => {
                WHERE keranjang.id_user = ${id_user}`;
   db.query(sql, (err, fields) => {
     if (err) throw err;
-    response(200, fields, "get data from keranjang user successfully", res);
+    response(200, fields, "get all data from keranjang user successfully", res);
   });
 });
+
+// Route untuk menghapus data menu dari keranjang
+app.delete('/deleteitemcart', (req, res) => {
+  const { id } = req.body
+  const sql = `DELETE FROM keranjang WHERE id=${id}`
+  db.query(sql, (err, fields) => {
+    if (err) response(500, "invalid", "error", res)
+    if (fields.affectedRows > 0){
+      const data = {
+        isDeleted: true,
+      }
+      response(200, data, "Deleted menu succes", res)
+    } else {
+      response(404, "menu not found", "error", res)
+    }
+  })
+})
+
 
 
 
