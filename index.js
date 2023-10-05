@@ -139,8 +139,8 @@ app.post('/keranjang', (req, res) => {
 // UNTUK MENAMPILKAN DATA DARI TABEL keranjang
 app.get('/keranjang/:id_menu', (req, res) => {
   const id_menu = req.params.id_menu
-  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga, keranjang.id 
-               FROM keranjang JOIN menu ON keranjang.id_menu = menu.id 
+  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga, keranjang.id_keranjang 
+               FROM keranjang JOIN menu ON keranjang.id_menu = menu.id_menu 
                WHERE keranjang.id_menu = ${id_menu}`
   db.query(sql, (err, fields) => {
     if (err) throw err
