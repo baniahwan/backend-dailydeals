@@ -111,11 +111,12 @@ app.post('/login', (req, res) => {
   });
 });
 
+// KERANJANG
 // Route untuk menambahkan data ke tabel "keranjang"
 app.post('/keranjang', (req, res) => {
   const { jumlah_item, total_harga, id_menu, id_user } = req.body;
 
-  const sql = `INSERT INTO keranjang (jumlah, total_harga, id_menu) VALUES (${jumlah_item}, ${total_harga}, ${id_menu}, ${id_user})`;
+  const sql = `INSERT INTO keranjang (jumlah, total_harga, id_menu, id_user) VALUES (${jumlah_item}, ${total_harga}, ${id_menu}, ${id_user})`;
   const values = [jumlah_item, total_harga, id_menu, id_user];
 
   db.query(sql, values, (err, result) => {
