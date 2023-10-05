@@ -142,14 +142,17 @@ app.get('/keranjang/:id_menu', (req, res) => {
 
 // Route untuk menampilkan semua data dari tabel "keranjang" milik user
 app.get('/keranjang/user/:id_user', (req, res) => {
-  const id_user = req.params.id_user
-  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga FROM keranjang JOIN menu ON keranjang.id_user = user.id 
-  WHERE keranjang.id_user = ${id_user}`
+  const id_user = req.params.id_user;
+  const sql = `SELECT menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
+               FROM keranjang 
+               JOIN menu ON keranjang.id_menu = menu.id 
+               WHERE keranjang.id_user = ${id_user}`;
   db.query(sql, (err, fields) => {
-    if (err) throw err
-    response(200, fields, "get data from keranjang successfully", res)
-  })
-})
+    if (err) throw err;
+    response(200, fields, "get data from keranjang user successfully", res);
+  });
+});
+
 
 
 
