@@ -184,7 +184,7 @@ app.delete('/deleteitemcart', (req, res) => {
 app.post('/checkout', (req, res) => {
   const { jumlah_item, total_harga, payment_method, alamat, id_user } = req.body;
 
-  const sql = `INSERT INTO checkout (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, ${payment_method}, ${alamat}, ${id_user})`;
+  const sql = `INSERT INTO 'checkout' (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, '${payment_method}', '${alamat}', ${id_user})`;
   const values = [jumlah_item, total_harga, payment_method, alamat, id_user];
 
   db.query(sql, values, (err, result) => {
