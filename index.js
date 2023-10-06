@@ -184,7 +184,7 @@ app.delete('/deleteitemcart', (req, res) => {
 app.post('/checkout', (req, res) => {
   const { jumlah_item, total_harga, payment_method, alamat, id_user } = req.body;
 
-  const sql = `INSERT INTO keranjang (jumlah_item, total_harga, payment_method, adress, id_user) VALUES (${jumlah_item}, ${total_harga}, ${payment_method}, ${alamat}, ${id_user})`;
+  const sql = `INSERT INTO keranjang (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, ${payment_method}, ${alamat}, ${id_user})`;
   const values = [jumlah_item, total_harga, payment_method, alamat, id_user];
 
   db.query(sql, values, (err, result) => {
@@ -204,6 +204,8 @@ app.get('/checkout/user/:id_user', (req, res) => {
                       menu.nama AS menu_nama,
                       keranjang.jumlah AS keranjang_jumlah,
                       keranjang.total_harga AS keranjang_total_harga
+                      checkout.payment_method AS checkout_payment_method
+                      checkout.alamat AS checkout_alamat
               FROM checkout
                 JOIN user ON checkout.id_user = user.id_user
                 JOIN keranjang ON checkout.id_keranjang = keranjang.id
