@@ -200,19 +200,18 @@ app.post('/checkout', (req, res) => {
 // UNTUK MENAMPILKAN SEMUA DATA DARI TABEL checkout DENGAN ID USER
 app.get('/checkout/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
-  const sql = `
-    SELECT 
-      user.username AS user_username,
-      menu.nama AS menu_nama,
-      keranjang.jumlah AS keranjang_jumlah,
-      keranjang.total_harga AS keranjang_total_harga,
-      checkout.payment_method AS checkout_payment_method,
-      checkout.alamat AS checkout_alamat
-    FROM checkout
-    JOIN keranjang ON checkout.id_keranjang = keranjang.id
-    JOIN menu ON keranjang.id_menu = menu.id
-    JOIN user ON checkout.id_user = user.id_user
-    WHERE checkout.id_user = ${id_user}`;
+  const sql = `SELECT user.username AS user_username,
+                      menu.nama AS menu_nama,
+                      keranjang.jumlah_item AS keranjang_jumlah,
+                      keranjang.total_harga AS keranjang_total_harga,
+                      checkout.payment_method AS checkout_payment_method,
+                      checkout.alamat AS checkout_alamat,
+                      checkout.id_user AS checkout_id_user
+                FROM checkout
+                      JOIN keranjang ON checkout.id_user = keranjang.id_user
+                      JOIN menu ON keranjang.id_menu = menu.id_menu
+                      JOIN user ON checkout.id_user = user.id_user
+                WHERE checkout.id_user = ${id_user}`;
     
   db.query(sql, (err, fields) => {
     if (err) {
