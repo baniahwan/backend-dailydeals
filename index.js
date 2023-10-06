@@ -202,8 +202,8 @@ app.get('/checkout/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
   const sql = `SELECT user.username AS user_username,
                       menu.nama AS menu_nama,
-                      keranjang.jumlah_item AS keranjang_jumlah,
-                      keranjang.total_harga AS keranjang_total_harga,
+                      keranjang.jumlah_item AS jumlah_item_diKeranjang,
+                      keranjang.total_harga AS total_harga_diKeranjang,
                       checkout.payment_method AS checkout_payment_method,
                       checkout.alamat AS checkout_alamat,
                       checkout.id_user AS checkout_id_user
@@ -218,7 +218,7 @@ app.get('/checkout/user/:id_user', (req, res) => {
       console.error('Error fetching data from database:', err);
       res.status(500).json({ message: 'Internal server error' });
     } else {
-      res.status(200).json({ data: fields, message: 'Data retrieved successfully' });
+      res.status(200).json({ data: fields, message: 'Data checkout by id_user retrieved successfully' });
     }
   });
 });
