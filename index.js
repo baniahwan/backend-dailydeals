@@ -179,6 +179,44 @@ app.delete('/deleteitemcart', (req, res) => {
 })
 
 
+//CHECKOUT
+//UNTUK MENAMBAHKAN DATA CHECKOUT
+app.post('/checkout', (req, res) => {
+  const { jumlah_item, total_harga, payment_method, alamat, id_user } = req.body;
+
+  const sql = `INSERT INTO keranjang (jumlah_item, total_harga, payment_method, adress, id_user) VALUES (${jumlah_item}, ${total_harga}, ${payment_method}, ${alamat}, ${id_user})`;
+  const values = [jumlah_item, total_harga, payment_method, alamat, id_user];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting data into checkout', err);
+      res.status(500).json({ message: 'Internal server error' });
+    } else {
+      res.status(200).json({ message: 'Data added to checkout successfully' });
+    }
+  });
+});
+
+// UNTUK MENAMPILKAN SEMUA DATA DARI TABEL checkout DENGAN ID USER
+app.get('/checkout/user/:id_user', (req, res) => {
+  const id_user = req.params.id_user;
+  const sql = `SELECT user.username AS user_username,
+                      menu.nama AS menu_nama,
+                      keranjang.jumlah AS keranjang_jumlah,
+                      keranjang.total_harga AS keranjang_total_harga
+              FROM checkout
+                JOIN user ON checkout.id_user = user.id_user
+                JOIN keranjang ON checkout.id_keranjang = keranjang.id
+                JOIN menu ON keranjang.id_menu = menu.id
+              WHERE checkout.id_user = ${id_user};`;
+  db.query(sql, (err, fields) => {
+    if (err) throw err;
+    response(200, fields, "get all data from keranjang user successfully", res);
+  });
+});
+
+
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
