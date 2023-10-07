@@ -208,7 +208,6 @@ app.get('/checkout/user/:id_user', (req, res) => {
                       checkout.alamat AS checkout_alamat,
                       checkout.id_user AS checkout_id_user
                 FROM checkout
-                      JOIN menu ON keranjang.id_menu = menu.id_menu
                       JOIN user ON checkout.id_user = user.id_user
                 WHERE checkout.id_user = ${id_user}`;
     
