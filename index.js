@@ -163,7 +163,7 @@ app.get('/keranjang/user/:id_user', (req, res) => {
 
 // UNTUK MENGHAPUS DATA MENU DARI KERANJANG
 app.delete('/deleteitemcart/:id_keranjang', (req, res) => {
-  const { id_keranjang } = req.params.id_keranjang
+  const { id_keranjang } = req.params
   const sql = `DELETE FROM keranjang WHERE id_keranjang=${id_keranjang}`
   
   db.query(sql, (err, result) => {
