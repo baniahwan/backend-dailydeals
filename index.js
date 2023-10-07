@@ -12,14 +12,13 @@ const crypto = require('crypto')
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5501');
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5501');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
-app.use(cors({
-  origin: 'http://127.0.0.1:5501',
-}));
+// app.use(cors({
+//   origin: 'http://127.0.0.1:5501',
+// }));
 
 app.use(bodyParser.json())
 
@@ -151,7 +150,7 @@ app.get('/keranjang/:id_menu', (req, res) => {
 // UNTUK MENAMPILKAN SEMUA DATA DARI TABEL KERANJANG DENGAN ID USER
 app.get('/keranjang/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
-  const sql = `SELECT menu.id_menu, menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga 
+  const sql = `SELECT menu.id_menu, menu.nama, menu.gambar, menu.harga, keranjang.jumlah_item, keranjang.total_harga, keranjang.id_keranjang 
                FROM keranjang 
                JOIN menu ON keranjang.id_menu = menu.id_menu
                WHERE keranjang.id_user = ${id_user}`;
@@ -205,13 +204,10 @@ app.get('/checkout/user/:id_user', (req, res) => {
   const id_user = req.params.id_user;
   const sql = `SELECT user.username AS user_username,
                       menu.nama AS menu_nama,
-                      keranjang.jumlah_item AS jumlah_item_diKeranjang,
-                      keranjang.total_harga AS total_harga_diKeranjang,
                       checkout.payment_method AS checkout_payment_method,
                       checkout.alamat AS checkout_alamat,
                       checkout.id_user AS checkout_id_user
                 FROM checkout
-                      JOIN keranjang ON checkout.id_user = keranjang.id_user
                       JOIN menu ON keranjang.id_menu = menu.id_menu
                       JOIN user ON checkout.id_user = user.id_user
                 WHERE checkout.id_user = ${id_user}`;
