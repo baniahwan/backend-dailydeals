@@ -11,8 +11,8 @@ const crypto = require('crypto')
 // Middleware untuk mengizinkan CORS (Cross-Origin Resource Sharing)
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
   res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5501');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5501');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
