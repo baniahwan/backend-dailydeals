@@ -182,22 +182,53 @@ app.delete('/deleteitemcart/:id_keranjang', (req, res) => {
 
 
 //CHECKOUT
-//UNTUK MENAMBAHKAN DATA CHECKOUT
+//UNTUK MENAMBAHKAN DATA CHECKOUT SEKALIGUS MENGHAPUS DATA KERANJANG MILIK USER
 app.post('/checkout', (req, res) => {
   const { jumlah_item, total_harga, payment_method, alamat, id_user } = req.body;
 
-  const sql = `INSERT INTO checkout (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, '${payment_method}', '${alamat}', ${id_user})`;
-  const values = [jumlah_item, total_harga, payment_method, alamat, id_user];
+  const sqlCheckout = `INSERT INTO checkout (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, '${payment_method}', '${alamat}', ${id_user})`;
+  const sqlDeleteKeranjang = `DELETE FROM keranjang WHERE id_user=${id_user}`;
 
-  db.query(sql, values, (err, result) => {
+  db.beginTransaction((err) => {
     if (err) {
-      console.error('Error inserting data into checkout', err);
+      console.error('Error beginning transaction:', err);
       res.status(500).json({ message: 'Internal server error' });
-    } else {
-      res.status(200).json({ message: 'Payment Succes And Data added to checkout successfully' });
+      return;
     }
+
+    db.query(sqlCheckout, (err, resultCheckout) => {
+      if (err) {
+        console.error('Error inserting data into checkout', err);
+        db.rollback(() => {
+          res.status(500).json({ message: 'Internal server error' });
+        });
+        return;
+      }
+
+      db.query(sqlDeleteKeranjang, (err, resultDelete) => {
+        if (err) {
+          console.error('Error deleting data from keranjang', err);
+          db.rollback(() => {
+            res.status(500).json({ message: 'Internal server error' });
+          });
+          return;
+        }
+
+        db.commit((err) => {
+          if (err) {
+            console.error('Error committing transaction', err);
+            db.rollback(() => {
+              res.status(500).json({ message: 'Internal server error' });
+            });
+          } else {
+            res.status(200).json({ message: 'Payment Success and data added to checkout successfully, and cart items deleted' });
+          }
+        });
+      });
+    });
   });
 });
+
 
 // UNTUK MENAMPILKAN SEMUA DATA DARI TABEL checkout DENGAN ID USER
 app.get('/checkout/user/:id_user', (req, res) => {
@@ -283,3 +314,49 @@ app.listen(port, () => {
 //     }
 //   })
 // })
+
+app.post('/checkout', (req, res) => {
+  const { jumlah_item, total_harga, payment_method, alamat, id_user } = req.body;
+
+  const sqlCheckout = `INSERT INTO checkout (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, '${payment_method}', '${alamat}', ${id_user})`;
+  const sqlDeleteKeranjang = `DELETE FROM keranjang WHERE id_user='${id_user}'`;
+
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error('Error beginning transaction:', err);
+      res.status(500).json({ message: 'Internal server error' });
+      return;
+    }
+
+    db.query(sqlCheckout, (err, result) => {
+      if (err) {
+        console.error('Error inserting data into checkout', err);
+        db.rollback(() => {
+          res.status(500).json({ message: 'Internal server error' });
+        });
+        return;
+      }
+
+      db.query(sqlDeleteKeranjang, (err, result) => {
+        if (err) {
+          console.error('Error deleting data from keranjang', err);
+          db.rollback(() => {
+            res.status(500).json({ message: 'Internal server error' });
+          });
+          return;
+        }
+
+        db.commit((err) => {
+          if (err) {
+            console.error('Error committing transaction', err);
+            db.rollback(() => {
+              res.status(500).json({ message: 'Internal server error' });
+            });
+          } else {
+            res.status(200).json({ message: 'Payment Success and data added to checkout successfully, and cart items deleted' });
+          }
+        });
+      });
+    });
+  });
+});
