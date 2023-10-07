@@ -192,7 +192,7 @@ app.post('/checkout', (req, res) => {
   db.beginTransaction((err) => {
     if (err) {
       console.error('Error beginning transaction:', err);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ message: 'Internal server error 1' });
       return;
     }
 
@@ -200,7 +200,7 @@ app.post('/checkout', (req, res) => {
       if (err) {
         console.error('Error inserting data into checkout', err);
         db.rollback(() => {
-          res.status(500).json({ message: 'Internal server error' });
+          res.status(500).json({ message: 'Internal server error 2' });
         });
         return;
       }
@@ -209,7 +209,7 @@ app.post('/checkout', (req, res) => {
         if (err) {
           console.error('Error deleting data from keranjang', err);
           db.rollback(() => {
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(500).json({ message: 'Internal server error 3' });
           });
           return;
         }
@@ -218,7 +218,7 @@ app.post('/checkout', (req, res) => {
           if (err) {
             console.error('Error committing transaction', err);
             db.rollback(() => {
-              res.status(500).json({ message: 'Internal server error' });
+              res.status(500).json({ message: 'Internal server error 4' });
             });
           } else {
             res.status(200).json({ message: 'Payment Success and data added to checkout successfully, and cart items deleted' });
