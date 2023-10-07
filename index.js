@@ -189,18 +189,11 @@ app.post('/checkout', (req, res) => {
   const sqlCheckout = `INSERT INTO checkout (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, '${payment_method}', '${alamat}', ${id_user})`;
   const sqlDeleteKeranjang = `DELETE FROM keranjang WHERE id_user=${id_user}`;
 
-  db.beginTransaction((err) => {
-    if (err) {
-      console.error('Error beginning transaction:', err);
-      res.status(500).json({ message: 'Internal server error 1' });
-      return;
-    }
-
     db.query(sqlCheckout, (err, resultCheckout) => {
       if (err) {
         console.error('Error inserting data into checkout', err);
         db.rollback(() => {
-          res.status(500).json({ message: 'Internal server error 2' });
+          res.status(500).json({ message: 'Internal server error 1' });
         });
         return;
       }
@@ -209,22 +202,10 @@ app.post('/checkout', (req, res) => {
         if (err) {
           console.error('Error deleting data from keranjang', err);
           db.rollback(() => {
-            res.status(500).json({ message: 'Internal server error 3' });
+            res.status(500).json({ message: 'Internal server error 2' });
           });
           return;
         }
-
-        db.commit((err) => {
-          if (err) {
-            console.error('Error committing transaction', err);
-            db.rollback(() => {
-              res.status(500).json({ message: 'Internal server error 4' });
-            });
-          } else {
-            res.status(200).json({ message: 'Payment Success and data added to checkout successfully, and cart items deleted' });
-          }
-        });
-      });
     });
   });
 });
