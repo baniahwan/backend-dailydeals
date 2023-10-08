@@ -7,7 +7,6 @@ const db = require('./connection.js')
 const response = require('./response.js')
 const crypto = require('crypto')
 
-
 // Middleware untuk mengizinkan CORS (Cross-Origin Resource Sharing)
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -182,65 +181,88 @@ app.delete('/deleteitemcart/:id_keranjang', (req, res) => {
 
 
 //CHECKOUT
-//UNTUK MENAMBAHKAN DATA CHECKOUT SEKALIGUS MENGHAPUS DATA KERANJANG MILIK USER
-app.post('/checkout', (req, res) => {
-  const { jumlah_item, total_harga, payment_method, alamat, id_user } = req.body;
+//UNTUK MENAMBAHKAN DATA CHECKOUT
+app.post("/checkout", (req, res) => {
+  const { payment_method, alamat, id_user } =
+    req.body;
 
-  const sqlCheckout = `INSERT INTO checkout (jumlah_item, total_harga, payment_method, alamat, id_user) VALUES (${jumlah_item}, ${total_harga}, '${payment_method}', '${alamat}', ${id_user})`;
-  const sqlDeleteKeranjang = `DELETE FROM keranjang WHERE id_user=${id_user}`;
+  const sql = `INSERT INTO checkout (payment_method, alamat, id_user) VALUES ('${payment_method}', '${alamat}', ${id_user})`;
+  const values = [payment_method, alamat, id_user];
 
-    db.query(sqlCheckout, (err, resultCheckout) => {
-      if (err) {
-        console.error('Error inserting data into checkout', err);
-        db.rollback(() => {
-          res.status(500).json({ message: 'Internal server error 1' });
-        });
-        return;
-      }
-
-      db.query(sqlDeleteKeranjang, (err, resultDelete) => {
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting data into checkout", err);
+      res.status(500).json({ message: "Internal server error" });
+    } else {
+      const sqlKeranjang = `select * from keranjang where id_user = ?`;
+      db.query(sqlKeranjang, [id_user], (err, result2) => {
         if (err) {
-          console.error('Error deleting data from keranjang', err);
-          db.rollback(() => {
-            res.status(500).json({ message: 'Internal server error 2' });
+          res.status(500).json({ message: "Internal server error" });
+        } else {
+          result2.forEach((val) => {
+            const sqlCheckoutItems = `INSERT INTO checkout_item (checkout_id, jumlah_item, total_harga, id_menu) VALUES (${result.insertId},${val.jumlah_item},${val.total_harga},${val.id_menu})`;
+            db.query(sqlCheckoutItems, (err, _result3) => {
+              if (err) throw err;
+            });
           });
-          return;
+
+          const sqlDeleteKeranjangUser = `DELETE FROM keranjang where id_user = ?`;
+          db.query(sqlDeleteKeranjangUser, [id_user], (err, _result4) => {
+            if (err) throw err;
+          });
         }
-    });
+      });
+      res.status(200).json({
+        message: "Payment Succes And Data added to checkout successfully",
+      });
+    }
   });
 });
 
-
 // UNTUK MENAMPILKAN SEMUA DATA DARI TABEL checkout DENGAN ID USER
-app.get('/checkout/user/:id_user', (req, res) => {
+app.get("/checkout/user/:id_user", (req, res) => {
   const id_user = req.params.id_user;
   const sql = `SELECT user.username AS user_username,
-                      menu.nama AS menu_nama,
                       checkout.payment_method AS checkout_payment_method,
                       checkout.alamat AS checkout_alamat,
-                      checkout.id_user AS checkout_id_user
+                      checkout.id
                 FROM checkout
+                      JOIN checkout_item ON checkout.id = checkout_item.checkout_id
                       JOIN user ON checkout.id_user = user.id_user
-                WHERE checkout.id_user = ${id_user}`;
-    
+                WHERE checkout.id_user = ${id_user} order by checkout.tanggal desc limit 1`;
+
   db.query(sql, (err, fields) => {
     if (err) {
-      console.error('Error fetching data from database:', err);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error fetching data from database:", err);
+      res.status(500).json({ message: "Internal server error" });
     } else {
-      res.status(200).json({ data: fields, message: 'Data checkout by id_user retrieved successfully' });
+      const sqlDetails = `select checkout_item.jumlah_item, checkout_item.total_harga, menu.nama from checkout_item inner join menu on menu.id_menu = checkout_item.id_menu where checkout_item.checkout_id = ?`;
+      db.query(sqlDetails, [fields[0]['id']], (err1, fields2) => {
+        if (err1) {
+          res.status(500).json({ message: "Internal server error" });
+        } else {
+          const data = { 
+            ...fields[0],
+            details: fields2
+           } 
+          res.status(200).json({
+            data,
+            message: "Data checkout by id_user retrieved successfully",
+          });
+        }
+      })
     }
   });
 });
 
 // UNTUK DELETE DATA CHECKOUT
-app.delete('/deletecheckout/:id', (req, res) => {
-  const { id } = req.params
-  const sql = `DELETE FROM checkout WHERE id=${id}`
-  
+app.delete("/deletecheckout/:id", (req, res) => {
+  const { id } = req.params;
+  const sql = `DELETE FROM checkout WHERE id=${id}`;
+
   db.query(sql, (err, result) => {
     if (err) {
-      res.status(500).json({ message: "Error", error: err })
+      res.status(500).json({ message: "Error", error: err });
     } else if (result.affectedRows > 0) {
       const data = {
         isDeleted: true,
